@@ -1,22 +1,23 @@
 {
   "name": "@sentinel/runtime",
   "version": "1.0.0",
-  "private": true,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
     "sentinel-runtime": "./dist/index.js"
   },
+  "files": ["dist"],
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "prepublishOnly": "tsc -p tsconfig.json",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@sentinel/sdk": "workspace:*",
-    "@sentinel/shared": "workspace:*",
-    "@sentinel/types": "workspace:*"
+    "@sentinel/sdk": "^1.0.0",
+    "@sentinel/shared": "^1.0.0",
+    "@sentinel/types": "^1.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
