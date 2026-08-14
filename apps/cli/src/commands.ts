@@ -1,5 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import * as os from 'node:os';
+import { execSync } from 'node:child_process';
 import * as readline from 'node:readline';
 import { SentinelClient } from '@sentinel/sdk';
 import {
@@ -38,6 +40,38 @@ export function getClient(): SentinelClient {
     apiKey: config.apiKey,
     accessToken: config.accessToken,
   });
+}
+
+function gitSafe(args: string): string | null {
+  try {
+    const out = execSync(`git ${args}`, {
+      stdio: ['ignore', 'pipe', 'ignore'],
+      encoding: 'utf-8',
+      timeout: 3000,
+    }).trim();
+    return out || null;
+  } catch {
+    return null;
+  }
+}
+
+export function detectProjectName(): string {
+  const remote = gitSafe('config --get remote.origin.url');
+  if (remote) {
+    const match = remote.match(/([^\/]+?)(?:\.git)?$/);
+    if (match?.[1]) return match[1];
+  }
+  const topLevel = gitSafe('rev-parse --show-toplevel');
+  if (topLevel) return path.basename(topLevel);
+  return path.basename(process.cwd());
+}
+
+export function detectAgentName(): string {
+  const gitUser = gitSafe('config --get user.name');
+  const identity = [gitUser || os.userInfo().username, os.hostname()]
+    .filter(Boolean)
+    .join('@');
+  return identity || 'cli-agent';
 }
 
 export async function loginCommand(options: {
@@ -109,7 +143,8 @@ export async function initCommand(): Promise<void> {
 
   let projectId: string;
   if (projects.length === 0) {
-    const name = (await prompt('Project name: ')) || 'my-app';
+    const detected = detectProjectName();
+    const name = (await prompt(`Project name [${detected}]: `)) || detected;
     const project = await client.projects.create({ name });
     projectId = project.id;
     console.log(`Created project: ${project.name} (${project.id})`);
@@ -121,7 +156,7 @@ export async function initCommand(): Promise<void> {
     if (!isNaN(num) && num > 0 && num <= projects.length) {
       projectId = projects[num - 1].id;
     } else {
-      const project = await client.projects.create({ name: choice || 'my-app' });
+      const project = await client.projects.create({ name: choice || detectProjectName() });
       projectId = project.id;
     }
   }
@@ -131,7 +166,7 @@ export async function initCommand(): Promise<void> {
   if (agents.length === 0) {
     const agent = await client.agents.create({
       projectId,
-      name: 'Local Agent',
+      name: detectAgentName(),
       provider: 'local',
       agentType: 'cli',
       capabilities: [
