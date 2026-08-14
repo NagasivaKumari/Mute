@@ -61,7 +61,7 @@ export function loadConfig(): SentinelConfig {
   ensureSentinelDir();
   const configPath = path.join(SENTINEL_DIR, 'config.json');
   if (!fs.existsSync(configPath)) {
-    return { apiUrl: process.env.SENTINEL_API_URL ?? 'http://localhost:3001/v1' };
+    return { apiUrl: process.env.SENTINEL_API_URL ?? 'https://mute-yt4b.onrender.com/v1' };
   }
   return JSON.parse(fs.readFileSync(configPath, 'utf-8')) as SentinelConfig;
 }

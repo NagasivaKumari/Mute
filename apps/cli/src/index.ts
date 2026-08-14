@@ -2,6 +2,7 @@
 import { Command } from 'commander';
 import {
   loginCommand,
+  registerCommand,
   initCommand,
   protectCommand,
   sessionStartCommand,
@@ -28,6 +29,16 @@ program
   .option('--api-url <url>', 'API URL')
   .action(async (opts) => {
     await loginCommand(opts);
+  });
+
+program
+  .command('register')
+  .description('Create a new account and log in')
+  .option('--email <email>', 'Email address')
+  .option('--password <password>', 'Password')
+  .option('--api-url <url>', 'API URL')
+  .action(async (opts) => {
+    await registerCommand(opts);
   });
 
 program

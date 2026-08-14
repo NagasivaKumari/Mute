@@ -67,6 +67,42 @@ export async function loginCommand(options: {
   console.log(`Logged in as ${result.user.email}`);
 }
 
+export async function registerCommand(options: {
+  email?: string;
+  password?: string;
+  apiUrl?: string;
+}): Promise<void> {
+  const config = loadConfig();
+  if (options.apiUrl) config.apiUrl = options.apiUrl;
+
+  const email = options.email ?? (await prompt('Email: '));
+  const password = options.password ?? (await prompt('Password: '));
+  const org = (await prompt('Organization name: ')) || 'My Org';
+  const firstName = (await prompt('First name: ')) || 'First';
+  const lastName = (await prompt('Last name: ')) || 'Last';
+
+  const client = new SentinelClient({ apiUrl: config.apiUrl });
+  const result = await client.register({
+    organizationName: org,
+    email,
+    password,
+    firstName,
+    lastName,
+  });
+
+  config.accessToken = result.accessToken;
+
+  const keys = await client.apiKeys.list();
+  if (keys.length === 0 || !config.apiKey) {
+    const key = await client.apiKeys.create('CLI Runtime Key');
+    config.apiKey = key.key;
+    console.log(`API key created: ${key.key.slice(0, 12)}...`);
+  }
+
+  saveConfig(config);
+  console.log(`Registered and logged in as ${result.user.email}`);
+}
+
 export async function initCommand(): Promise<void> {
   const client = getClient();
   const projects = await client.projects.list();
