@@ -67,6 +67,15 @@ export function detectProjectName(): string {
 }
 
 export function detectAgentName(): string {
+  const env = process.env;
+  if (env.CLAUDE_CODE) return 'Claude Code';
+  if (env.CURSOR_TRACE_ID || env.CURSOR_TRACING) return 'Cursor';
+  if (env.GITHUB_COPILOT_AGENT) return 'GitHub Copilot';
+  if (env.CODEX || env.CODEX_API_KEY) return 'Codex';
+  if (env.WARP_IS_LOCAL_SHELL) return 'Warp';
+  if (env.TERM_PROGRAM === 'Cursor') return 'Cursor';
+  if (env.TERM_PROGRAM === 'vscode') return 'VS Code';
+  if (env.TERM_PROGRAM === 'iTerm.app') return 'iTerm';
   const gitUser = gitSafe('config --get user.name');
   const identity = [gitUser || os.userInfo().username, os.hostname()]
     .filter(Boolean)
