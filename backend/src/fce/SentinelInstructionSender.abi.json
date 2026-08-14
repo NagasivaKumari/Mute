@@ -1,0 +1,112 @@
+[
+  {
+    "type": "constructor",
+    "inputs": [
+      { "name": "_teeExtensionRegistry", "type": "address", "internalType": "address" },
+      { "name": "_teeMachineRegistry", "type": "address", "internalType": "address" }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "OP_COMMAND_ATTEST_POLICY",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "bytes32", "internalType": "bytes32" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "OP_COMMAND_AUTHORIZE_DANGEROUS",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "bytes32", "internalType": "bytes32" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "OP_COMMAND_AUTHORIZE_SECRET",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "bytes32", "internalType": "bytes32" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "OP_COMMAND_GET_STATE",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "bytes32", "internalType": "bytes32" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "OP_TYPE_SENTINEL",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "bytes32", "internalType": "bytes32" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "TEE_EXTENSION_REGISTRY",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "contract ITeeExtensionRegistry" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "TEE_MACHINE_REGISTRY",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "contract ITeeMachineRegistry" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "attestPolicy",
+    "inputs": [
+      { "name": "_data", "type": "bytes", "internalType": "bytes" }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "authorizeDangerous",
+    "inputs": [
+      { "name": "_data", "type": "bytes", "internalType": "bytes" }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "authorizeSecret",
+    "inputs": [
+      { "name": "_data", "type": "bytes", "internalType": "bytes" }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "getState",
+    "inputs": [
+      { "name": "_data", "type": "bytes", "internalType": "bytes" }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "setExtensionId",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "InstructionDispatched",
+    "inputs": [
+      { "name": "instructionId", "type": "bytes32", "indexed": true },
+      { "name": "opType", "type": "bytes32", "indexed": true },
+      { "name": "opCommand", "type": "bytes32", "indexed": true }
+    ],
+    "anonymous": false
+  }
+]

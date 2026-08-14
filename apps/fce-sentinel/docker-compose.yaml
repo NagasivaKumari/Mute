@@ -1,0 +1,56 @@
+services:
+  redis:
+    image: redis:7-alpine
+    command: redis-server --save "" --appendonly no
+    ports:
+      - "${REDIS_BIND:-127.0.0.1:6382}:6379"
+    tmpfs:
+      - /data
+
+  ext-proxy:
+    image: ${REGISTRY:-local}/tee-proxy
+    env_file:
+      - path: ../../.env
+        required: false
+    volumes:
+      - ./config/proxy/extension_proxy.docker.toml:/app/config/config.toml:ro
+    environment:
+      - PROXY_PRIVATE_KEY=${FLARE_PRIVATE_KEY?}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${EXT_PROXY_INTERNAL_BIND:-0.0.0.0:6673}:6663"
+      - "${EXT_PROXY_EXTERNAL_BIND:-0.0.0.0:6674}:6664"
+    depends_on:
+      - redis
+
+  extension-tee:
+    build:
+      context: ./go
+      dockerfile: Dockerfile
+    env_file:
+      - path: ../../.env
+        required: false
+      - path: ./config/extension.env
+        required: false
+    environment:
+      - PRIVATE_KEY=${FLARE_PRIVATE_KEY?}
+      - MODE=${MODE:-1}
+      - CHAIN_ID=${CHAIN_ID:-114}
+      - CHAIN_URL=${FLARE_RPC_URL:-https://coston2-api.flare.network/ext/C/rpc}
+      - INITIAL_OWNER=${INITIAL_OWNER?}
+      - GOVERNANCE_SIGNERS=${GOVERNANCE_SIGNERS:-${INITIAL_OWNER?}}
+      - GOVERNANCE_THRESHOLD=${GOVERNANCE_THRESHOLD:-1}
+      - PROXY_URL=http://ext-proxy:6663
+      - CONFIG_PORT=5501
+      - SIGN_PORT=7701
+      - EXTENSION_PORT=7702
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - SIMULATED_TEE=${SIMULATED_TEE:-true}
+    depends_on:
+      - ext-proxy
+
+networks:
+  default:
+    name: ${COMPOSE_NETWORK:-docker_default}
+    external: true

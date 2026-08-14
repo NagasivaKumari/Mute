@@ -1,0 +1,16 @@
+services:
+  ext-proxy:
+    volumes:
+      - ./config/proxy/extension_proxy.coston2.docker.toml:/app/config/config.toml:ro
+
+  extension-tee:
+    environment:
+      - CHAIN_URL=${CHAIN_URL:-https://coston2-api.flare.network/ext/C/rpc}
+      - CHAIN_ID=${CHAIN_ID:-114}
+    volumes:
+      - ./config/coston2:/app/config
+
+networks:
+  default:
+    name: ${COMPOSE_NETWORK:-extension-scaffold-coston2}
+    external: false

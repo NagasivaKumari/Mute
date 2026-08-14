@@ -1,0 +1,79 @@
+{
+
+  "name": "sentinel-vscode",
+
+  "displayName": "Sentinel Policy Mesh",
+
+  "description": "AI runtime policy enforcement for VS Code",
+
+  "version": "1.0.0",
+
+  "private": true,
+
+  "publisher": "sentinel",
+
+  "engines": {
+
+    "vscode": "^1.85.0"
+
+  },
+
+  "categories": ["Other"],
+
+  "activationEvents": ["onStartupFinished"],
+
+  "main": "./dist/extension.js",
+
+  "contributes": {
+
+    "commands": [
+
+      { "command": "sentinel.login", "title": "Sentinel: Login" },
+
+      { "command": "sentinel.startSession", "title": "Sentinel: Start Session" },
+
+      { "command": "sentinel.stopSession", "title": "Sentinel: Stop Session" },
+
+      { "command": "sentinel.openDashboard", "title": "Sentinel: Open Dashboard" },
+
+      { "command": "sentinel.viewApprovals", "title": "Sentinel: View Pending Approvals" },
+
+      { "command": "sentinel.status", "title": "Sentinel: Session Status" },
+
+      { "command": "sentinel.doctor", "title": "Sentinel: Doctor" }
+
+    ]
+
+  },
+
+  "scripts": {
+
+    "build": "tsc -p tsconfig.json",
+
+    "dev": "tsc -p tsconfig.json --watch",
+
+    "lint": "tsc -p tsconfig.json --noEmit"
+
+  },
+
+  "dependencies": {
+
+    "@sentinel/sdk": "workspace:*",
+
+    "@sentinel/shared": "workspace:*"
+
+  },
+
+  "devDependencies": {
+
+    "@types/node": "^22.10.2",
+
+    "@types/vscode": "^1.85.0",
+
+    "typescript": "^5.7.2"
+
+  }
+
+}
+
+

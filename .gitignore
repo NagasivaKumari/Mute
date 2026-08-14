@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Testing
+coverage/
+
+# Runtime local data
+.sentinel/
+
+# Hardhat
+contracts/cache/
+contracts/artifacts/
+contracts/typechain-types/
+
+# VS Code extension
+apps/vscode-extension/*.vsix
+
+# FCE auto-generated config
+apps/fce-sentinel/config/extension.env
+apps/fce-sentinel/config/deploy.log
+apps/fce-sentinel/go/language.env
+apps/fce-sentinel/config/proxy/extension_proxy.*.toml
+apps/fce-sentinel/go/docker.exe
+
+# Misc
+*.pem
+*.key
