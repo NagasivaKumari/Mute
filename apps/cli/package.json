@@ -13,8 +13,8 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@sentinel/sdk": "^1.0.0",
-    "@sentinel/shared": "^1.0.0",
+    "@sentinel/sdk": "workspace:*",
+    "@sentinel/shared": "workspace:*",
     "commander": "^12.1.0"
   },
   "devDependencies": {

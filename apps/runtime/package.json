@@ -15,9 +15,9 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@sentinel/sdk": "^1.0.0",
-    "@sentinel/shared": "^1.0.0",
-    "@sentinel/types": "^1.0.0"
+    "@sentinel/sdk": "workspace:*",
+    "@sentinel/shared": "workspace:*",
+    "@sentinel/types": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

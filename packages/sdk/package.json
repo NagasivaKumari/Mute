@@ -17,8 +17,8 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@sentinel/types": "^1.0.0",
-    "@sentinel/shared": "^1.0.0",
+    "@sentinel/types": "workspace:*",
+    "@sentinel/shared": "workspace:*",
     "socket.io-client": "^4.8.1"
   },
   "devDependencies": {

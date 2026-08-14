@@ -17,7 +17,7 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@sentinel/types": "^1.0.0"
+    "@sentinel/types": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.2"
