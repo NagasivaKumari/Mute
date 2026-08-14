@@ -5,6 +5,7 @@ import {
   registerCommand,
   initCommand,
   protectCommand,
+  runCommand,
   sessionStartCommand,
   sessionStopCommand,
   statusCommand,
@@ -53,6 +54,13 @@ program
   .description('Scan and protect secrets with sentinel:// references')
   .action(async () => {
     await protectCommand();
+  });
+
+program
+  .command('run <command>')
+  .description('Run a command with secrets resolved from vault')
+  .action(async (command: string) => {
+    await runCommand(command);
   });
 
 const session = program.command('session').description('Manage runtime sessions');

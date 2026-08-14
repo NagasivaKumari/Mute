@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import { execSync } from 'node:child_process';
+import { execSync, spawn } from 'node:child_process';
 import * as readline from 'node:readline';
 import { SentinelClient } from '@sentinel/sdk';
 import {
@@ -9,6 +9,8 @@ import {
   parseEnvContent,
   serializeEnvContent,
   PROTECTED_FILE_PATTERNS,
+  parseSecretReference,
+  vaultGet,
 } from '@sentinel/shared';
 import {
   loadConfig,
@@ -284,6 +286,103 @@ export async function protectCommand(): Promise<void> {
   fs.writeFileSync(envPath, serializeEnvContent(entries));
   console.log(`Protected ${protectedCount} secrets with sentinel:// references`);
   console.log('Plaintext values stored in encrypted local vault (~/.sentinel/vault.enc)');
+}
+
+export async function runCommand(command: string): Promise<void> {
+  const projectConfig = loadProjectConfig();
+  if (!projectConfig) {
+    console.error('Run sentinel init first');
+    process.exit(1);
+  }
+
+  const client = getClient();
+
+  // Get orgId and FCE authorization for vault access
+  const profile = await client.getProfile();
+  if (!profile?.organization?.id) {
+    console.error('No organization found — run sentinel login first');
+    process.exit(1);
+  }
+  const orgId = profile.organization.id;
+
+  let nonce;
+  try {
+    nonce = await client.runtime.getVaultNonce();
+  } catch (err) {
+    console.error(`Vault authorization unavailable: ${err instanceof Error ? err.message : err}`);
+    process.exit(1);
+  }
+  if (!nonce?.orgNonce || !nonce?.teeAuth) {
+    console.error('Backend did not return vault authorization');
+    process.exit(1);
+  }
+
+  // Open vault with FCE authorization
+  let dek = openVaultAuthorized(
+    orgId,
+    nonce.orgNonce,
+    nonce.teeAuth,
+    nonce.previousOrgNonce ?? undefined,
+  );
+  if (!dek) {
+    initVault(orgId, nonce.orgNonce);
+    dek = openVaultAuthorized(
+      orgId,
+      nonce.orgNonce,
+      nonce.teeAuth,
+      nonce.previousOrgNonce ?? undefined,
+    );
+  }
+  if (!dek) {
+    console.error('Failed to open vault with FCE authorization');
+    process.exit(1);
+  }
+
+  const envPath = path.join(process.cwd(), '.env');
+  if (!fs.existsSync(envPath)) {
+    console.error('No .env file found — run sentinel protect first');
+    process.exit(1);
+  }
+
+  const content = fs.readFileSync(envPath, 'utf-8');
+  const entries = parseEnvContent(content);
+
+  // Build env with resolved secrets
+  const resolvedEnv = { ...process.env };
+  let resolvedCount = 0;
+  for (const entry of entries) {
+    if (!entry.isReference) continue;
+    const secretName = parseSecretReference(entry.value);
+    if (!secretName) continue;
+    const value = vaultGet(secretName, dek);
+    if (value !== null) {
+      resolvedEnv[entry.key] = value;
+      resolvedCount++;
+    }
+  }
+
+  if (resolvedCount === 0) {
+    console.log('No sentinel:// references found to resolve');
+  } else {
+    console.log(`Resolved ${resolvedCount} secret(s) from vault`);
+  }
+
+  // Spawn the command with resolved env
+  const [cmd, ...args] = command.split(' ');
+  const child = spawn(cmd, args, {
+    stdio: 'inherit',
+    env: resolvedEnv,
+    shell: true,
+  });
+
+  child.on('error', (err) => {
+    console.error(`Failed to start command: ${err.message}`);
+    process.exit(1);
+  });
+
+  child.on('exit', (code) => {
+    process.exit(code ?? 0);
+  });
 }
 
 export async function sessionStartCommand(): Promise<void> {
