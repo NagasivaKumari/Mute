@@ -1,12 +1,14 @@
 {
-  "name": "@sentinel/mcp-server",
+  "name": "sentinel-mcp-server",
   "version": "1.0.0",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
     "sentinel-mcp": "./dist/index.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "tsc",
@@ -15,7 +17,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
-    "@sentinel/shared": "workspace:*",
+    "@sentinel/shared": "sentinel-shared",
     "zod": "^3.24.0"
   },
   "devDependencies": {

@@ -1,9 +1,11 @@
 {
-  "name": "@sentinel/shared",
+  "name": "sentinel-shared",
   "version": "1.0.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -17,7 +19,7 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@sentinel/types": "workspace:*"
+    "@sentinel/types": "sentinel-types"
   },
   "devDependencies": {
     "typescript": "^5.7.2"

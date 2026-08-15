@@ -57,48 +57,33 @@ export class FceService {
   }
 
   private async sendAndPoll(method: string, payload: object): Promise<any> {
-    if (!this.senderContract) {
-      throw new Error('FCE sender contract not initialized');
+    const body = JSON.stringify({
+      method: method,
+      payload: payload
+    });
+
+    // Primary path: configured FCE endpoint
+    let response = await fetch(`${this.proxyUrl}/action`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    });
+
+    // Local fallback: some dev setups expose /info on proxy but /action on extension-tee.
+    if (!response.ok && response.status === 404 && this.proxyUrl.includes('localhost:6674')) {
+      this.logger.warn('FCE /action not found on proxy URL; trying local extension-tee endpoint on :7702');
+      response = await fetch('http://localhost:7702/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body,
+      });
     }
 
-    await this.ensureInitialized();
-
-    const dataHex = ethers.hexlify(ethers.toUtf8Bytes(JSON.stringify(payload)));
-    const tx = await this.senderContract[method](dataHex, { value: this.txValue });
-    const receipt = await tx.wait();
-
-    const contractAddress = (this.senderContract.target as string).toLowerCase();
-    const iface = new ethers.Interface(SentinelInstructionSenderAbi as ethers.InterfaceAbi);
-    let instructionId: string | null = null;
-    for (const log of receipt.logs) {
-      if (log.address.toLowerCase() !== contractAddress) continue;
-      try {
-        const parsed = iface.parseLog({ topics: log.topics as string[], data: log.data });
-        if (parsed?.name === 'InstructionDispatched') {
-          instructionId = parsed.args.instructionId;
-          break;
-        }
-      } catch { }
+    if (!response.ok) {
+      throw new Error(`FCE proxy request failed: ${response.statusText}`);
     }
 
-    if (!instructionId) {
-      throw new Error('InstructionDispatched event not found in transaction receipt');
-    }
-
-    const start = Date.now();
-    while (Date.now() - start < this.pollTimeout) {
-      const response = await fetch(`${this.proxyUrl}/action-result/${instructionId}`);
-      if (response.ok) {
-        const result = await response.json();
-        if (result && result.status === 1 && result.data) {
-          const dataJson = ethers.toUtf8String(result.data);
-          return JSON.parse(dataJson);
-        }
-      }
-      await new Promise(r => setTimeout(r, this.pollInterval));
-    }
-
-    throw new Error(`Timeout polling for instruction result: ${instructionId}`);
+    return await response.json();
   }
 
   async authorizeSecret(

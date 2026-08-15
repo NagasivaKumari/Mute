@@ -6,6 +6,7 @@ import * as readline from 'node:readline';
 import { SentinelClient } from '@sentinel/sdk';
 import {
   makeSecretReference,
+  SecretDetector,
   parseEnvContent,
   serializeEnvContent,
   PROTECTED_FILE_PATTERNS,
@@ -267,7 +268,7 @@ export async function protectCommand(): Promise<void> {
 
   for (const entry of entries) {
     if (entry.isReference) continue;
-    if (!/password|secret|key|token|api|url/i.test(entry.key)) continue;
+    // Protect all variables according to strict zero-trust policy`n    if (entry.key === "NODE_ENV") continue;
 
     const secretName = entry.key.toLowerCase().replace(/[^a-z0-9]/g, '_');
     vaultSet(secretName, entry.value, dek);
@@ -519,4 +520,46 @@ export async function policyListCommand(): Promise<void> {
     if (conds.length) console.log(`  conditions: ${conds.join(' | ')}`);
     console.log(`  controls: ${p.controls.allowed ? 'allow' : 'deny'}${p.controls.approvalRequired ? ' +approval' : ''}${p.controls.auditRequired ? ' +audit' : ''}${p.controls.flareVerificationRequired ? ' +flare' : ''}`);
   }
+}
+
+export async function maskViewCommand(filePath?: string): Promise<void> {
+  const targetPath = path.resolve(process.cwd(), filePath || '.env');
+  if (!fs.existsSync(targetPath)) {
+    console.error('File not found: ' + targetPath);
+    process.exit(1);
+  }
+  const content = fs.readFileSync(targetPath, 'utf-8');
+  console.log('=================================================');
+  console.log('??? SENTINEL AI-PROTECTED MASKED VIEW (' + path.basename(targetPath) + '):');
+  console.log('=================================================');
+  const result = SecretDetector.maskContent(content);
+  console.log(result.masked);
+  console.log('=================================================');
+  console.log('?? Detected: ' + result.found + ' sensitive items | Masked: ' + result.maskedCount);
+  console.log('=================================================');
+}
+
+export async function vaultListCommand(): Promise<void> {
+  const vaultPath = path.join(os.homedir(), '.sentinel', 'vault.enc');
+  if (!fs.existsSync(vaultPath)) {
+    console.log('No local vault found at ' + vaultPath);
+    return;
+  }
+  const raw = fs.readFileSync(vaultPath, 'utf-8');
+  const json = JSON.parse(raw);
+  console.log('=================================================');
+  console.log('?? ENCRYPTED LOCAL VAULT: ' + vaultPath);
+  console.log('=================================================');
+  console.log('Organization ID: ' + json.header?.orgId);
+  console.log('Authority (TEE Key): ' + json.header?.authorityKey?.slice(0, 32) + '...');
+  console.log('Algorithm: AES-256-GCM (Hardware Derived + TEE Attested)');
+  console.log('\n?? Encrypted Secret Entries in Vault:');
+  const keys = Object.keys(json.secrets || {});
+  keys.forEach((k, idx) => {
+    const entry = json.secrets[k];
+    console.log('  [' + (idx + 1) + '] ' + k.padEnd(28) + ' -> Ciphertext: ' + entry.ciphertext.slice(0, 20) + '... (Nonce: ' + entry.nonce + ')');
+  });
+  console.log('=================================================');
+  console.log('Total Stored Secrets: ' + keys.length);
+  console.log('=================================================');
 }

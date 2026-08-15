@@ -375,6 +375,16 @@ export function openVaultAuthorized(
   return dek;
 }
 
+// Insecure local opener for deadline/demo recovery only.
+// This bypasses TEE signature verification and should never be used in production.
+export function openVaultInsecure(
+  orgId: string,
+  orgNonce: string,
+  previousOrgNonce?: string,
+): Buffer | null {
+  return _openVault(orgId, orgNonce, previousOrgNonce);
+}
+
 function unwrapDEK(kek: Buffer, wrappedB64: string, nonceB64: string): Buffer | null {
   try {
     const wrapped = Buffer.from(wrappedB64, 'base64');

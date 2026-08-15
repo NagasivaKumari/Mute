@@ -1,9 +1,11 @@
 {
-  "name": "@sentinel/sdk",
+  "name": "sentinel-sdk",
   "version": "1.0.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -17,8 +19,8 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@sentinel/types": "workspace:*",
-    "@sentinel/shared": "workspace:*",
+    "@sentinel/shared": "sentinel-shared",
+    "@sentinel/types": "sentinel-types",
     "socket.io-client": "^4.8.1"
   },
   "devDependencies": {

@@ -1,11 +1,13 @@
 {
-  "name": "@sentinel/cli",
+  "name": "sentinel-cli",
   "version": "1.0.0",
   "bin": {
     "sentinel": "./dist/index.js"
   },
   "main": "./dist/index.js",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "prepublishOnly": "tsc -p tsconfig.json",
@@ -13,8 +15,8 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@sentinel/sdk": "workspace:*",
-    "@sentinel/shared": "workspace:*",
+    "@sentinel/sdk": "sentinel-sdk",
+    "@sentinel/shared": "sentinel-shared",
     "commander": "^12.1.0"
   },
   "devDependencies": {

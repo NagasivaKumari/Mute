@@ -27,14 +27,19 @@ type Extension struct {
 	lastAuthorization   string
 	lastAttestation     string
 	lastDangerous       string
+
+	results map[string]teetypes.ActionResult
 }
 
 func New(extensionPort, signPort int) *Extension {
-	e := &Extension{}
+	e := &Extension{
+		results: make(map[string]teetypes.ActionResult),
+	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /state", e.stateHandler)
 	mux.HandleFunc("POST /action", e.actionHandler)
+	mux.HandleFunc("GET /action-result/{id}", e.actionResultHandler)
 
 	e.Server = &http.Server{Addr: fmt.Sprintf(":%d", extensionPort), Handler: mux}
 	return e
@@ -80,27 +85,34 @@ func (e *Extension) processAction(action teetypes.Action) (int, []byte) {
 	}
 }
 
+func (e *Extension) actionResultHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	e.mu.RLock()
+	ar, ok := e.results[id]
+	e.mu.RUnlock()
+
+	if !ok {
+		http.NotFound(w, r)
+		return
+	}
+
+	json.NewEncoder(w).Encode(ar)
+}
+
 func (e *Extension) processSentinel(action teetypes.Action, df *instruction.DataFixed) (int, []byte) {
+	var ar teetypes.ActionResult
 	switch {
 	case df.OPCommand == teeutils.ToHash(config.OPCommandAuthorizeSecret):
-		ar := e.processAuthorizeSecret(action, df)
-		b, _ := json.Marshal(ar)
-		return http.StatusOK, b
+		ar = e.processAuthorizeSecret(action, df)
 
 	case df.OPCommand == teeutils.ToHash(config.OPCommandAttestPolicy):
-		ar := e.processAttestPolicy(action, df)
-		b, _ := json.Marshal(ar)
-		return http.StatusOK, b
+		ar = e.processAttestPolicy(action, df)
 
 	case df.OPCommand == teeutils.ToHash(config.OPCommandAuthorizeDangerous):
-		ar := e.processAuthorizeDangerous(action, df)
-		b, _ := json.Marshal(ar)
-		return http.StatusOK, b
+		ar = e.processAuthorizeDangerous(action, df)
 
 	case df.OPCommand == teeutils.ToHash(config.OPCommandGetState):
-		ar := e.processGetState(action, df)
-		b, _ := json.Marshal(ar)
-		return http.StatusOK, b
+		ar = e.processGetState(action, df)
 
 	default:
 		return http.StatusNotImplemented, []byte(fmt.Sprintf(
@@ -112,6 +124,13 @@ func (e *Extension) processSentinel(action teetypes.Action, df *instruction.Data
 			teeutils.ToHash(config.OPCommandGetState).Hex(), config.OPCommandGetState,
 		))
 	}
+
+	e.mu.Lock()
+	e.results[action.Data.ID.Hex()] = ar
+	e.mu.Unlock()
+
+	b, _ := json.Marshal(ar)
+	return http.StatusOK, b
 }
 
 func (e *Extension) processAuthorizeSecret(action teetypes.Action, df *instruction.DataFixed) teetypes.ActionResult {

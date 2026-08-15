@@ -1,9 +1,11 @@
 {
-  "name": "@sentinel/types",
+  "name": "sentinel-types",
   "version": "1.0.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -18,5 +20,8 @@
   },
   "devDependencies": {
     "typescript": "^5.7.2"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

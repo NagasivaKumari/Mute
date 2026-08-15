@@ -13,6 +13,8 @@ import {
   approveCommand,
   doctorCommand,
   policyListCommand,
+  maskViewCommand,
+  vaultListCommand,
 } from './commands';
 
 const program = new Command();
@@ -112,6 +114,20 @@ program
   .description('List active policies')
   .action(async () => {
     await policyListCommand();
+  });
+
+program
+  .command('mask-view [file]')
+  .description('Display AI-safe masked view of a sensitive file')
+  .action(async (file?: string) => {
+    await maskViewCommand(file);
+  });
+
+program
+  .command('vault-list')
+  .description('Inspect encrypted entries stored in the local vault')
+  .action(async () => {
+    await vaultListCommand();
   });
 
 program.parse();

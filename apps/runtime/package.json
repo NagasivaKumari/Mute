@@ -1,12 +1,14 @@
 {
-  "name": "@sentinel/runtime",
+  "name": "sentinel-runtime",
   "version": "1.0.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
     "sentinel-runtime": "./dist/index.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "prepublishOnly": "tsc -p tsconfig.json",
@@ -15,9 +17,9 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@sentinel/sdk": "workspace:*",
-    "@sentinel/shared": "workspace:*",
-    "@sentinel/types": "workspace:*"
+    "@sentinel/sdk": "sentinel-sdk",
+    "@sentinel/shared": "sentinel-shared",
+    "@sentinel/types": "sentinel-types"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

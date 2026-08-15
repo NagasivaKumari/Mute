@@ -47,8 +47,9 @@ services:
       - EXTENSION_PORT=7702
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - SIMULATED_TEE=${SIMULATED_TEE:-true}
-    depends_on:
-      - ext-proxy
+    ports:
+      - "7701:7701"
+      - "7702:7702"
 
 networks:
   default:
