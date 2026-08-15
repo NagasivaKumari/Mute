@@ -1,6 +1,6 @@
 {
 
-  "name": "sentinel-vscode",
+  "name": "@sentinel/vscode",
 
   "displayName": "Sentinel Policy Mesh",
 
@@ -59,7 +59,6 @@
   "dependencies": {
 
     "@sentinel/sdk": "workspace:*",
-
     "@sentinel/shared": "workspace:*"
 
   },

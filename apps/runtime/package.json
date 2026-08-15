@@ -1,5 +1,5 @@
 {
-  "name": "sentinel-runtime",
+  "name": "@sentinel/runtime",
   "version": "1.0.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,9 +17,9 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@sentinel/sdk": "sentinel-sdk",
-    "@sentinel/shared": "sentinel-shared",
-    "@sentinel/types": "sentinel-types"
+    "@sentinel/sdk": "workspace:*",
+    "@sentinel/shared": "workspace:*",
+    "@sentinel/types": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

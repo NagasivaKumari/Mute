@@ -1,5 +1,5 @@
 {
-  "name": "sentinel-cli",
+  "name": "@sentinel/cli",
   "version": "1.0.0",
   "bin": {
     "sentinel": "./dist/index.js"
@@ -15,8 +15,8 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@sentinel/sdk": "sentinel-sdk",
-    "@sentinel/shared": "sentinel-shared",
+    "@sentinel/sdk": "workspace:*",
+    "@sentinel/shared": "workspace:*",
     "commander": "^12.1.0"
   },
   "devDependencies": {

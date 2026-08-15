@@ -1,5 +1,5 @@
 {
-  "name": "sentinel-mcp-server",
+  "name": "@sentinel/mcp-server",
   "version": "1.0.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
-    "@sentinel/shared": "sentinel-shared",
+    "@sentinel/shared": "workspace:*",
     "zod": "^3.24.0"
   },
   "devDependencies": {
